@@ -1,0 +1,111 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Product {
+public:
+    Product(int id, const string& name, double price)
+        : productId(id), productName(name), price(price) {}
+
+    void displayProductDetails() const {
+        cout << "Product ID: " << productId << "\tName: " << productName << "\tPrice: $" << price << endl;
+    }
+
+    double getPrice() const {
+        return price;
+    }
+
+private:
+    int productId;
+    string productName;
+    double price;
+};
+
+class ShoppingCart {
+public:
+    ShoppingCart() : products(nullptr), numProducts(0) {}
+
+    void addProduct(const Product& product) {
+        Product* newProducts = new Product[numProducts + 1];
+
+
+        for (int i = 0; i < numProducts; ++i) {
+            newProducts[i] = products[i];
+        }
+
+
+        newProducts[numProducts] = product;
+
+
+        delete[] products;
+        products = newProducts;
+        ++numProducts;
+    }
+
+    void displayAllProducts() const {
+        cout << "Products in the shopping cart:" << endl;
+        for (int i = 0; i < numProducts; ++i) {
+            products[i].displayProductDetails();
+        }
+    }
+
+    double calculateTotalCost() const {
+        double totalCost = 0.0;
+        for (int i = 0; i < numProducts; ++i) {
+            totalCost += products[i].getPrice();
+        }
+        return totalCost;
+    }
+
+    ~ShoppingCart() {
+        delete[] products;
+    }
+
+private:
+    Product* products;
+    int numProducts;
+};
+
+class User {
+public:
+    User(int id, const string& name)
+        : userId(id), userName(name), shoppingCart(nullptr) {}
+
+    void displayUserDetails() const {
+        cout << "User ID: " << userId << "\tName: " << userName << endl;
+    }
+
+    void associateShoppingCart(ShoppingCart* cart) {
+        shoppingCart = cart;
+    }
+
+    ShoppingCart* getShoppingCart() const {
+        return shoppingCart;
+    }
+
+private:
+    int userId;
+    string userName;
+    ShoppingCart* shoppingCart;
+};
+
+int main() {
+    Product product1(1, "Laptop", 999.99);
+    Product product2(2, "Smartphone", 499.99);
+    ShoppingCart cart;
+    cart.addProduct(product1);
+    cart.addProduct(product2);
+    User user(101, "John Doe");
+    user.associateShoppingCart(&cart);
+    user.displayUserDetails();
+    ShoppingCart* userCart = user.getShoppingCart();
+    if (userCart) {
+        userCart->displayAllProducts();
+        double totalCost = userCart->calculateTotalCost();
+        cout << "Total Cost: $" << totalCost << endl;
+    } else {
+        cout << "User has no shopping cart." << endl;
+    }
+
+    return 0;
+}
